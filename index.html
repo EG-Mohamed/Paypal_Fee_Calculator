@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="PayPal Fee Calculator - Professional Multi-language Calculator" />
+    <meta property="og:description" content="Calculate PayPal fees instantly with our elegant, multi-language calculator. Supports multiple countries and currencies." />
+    <title>PayPal Fee Calculator - حاسبة عمولة باي بال</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'alexandria': ['Alexandria', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient': 'gradient 8s ease infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        gradient: {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Font - Alexandria -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&display=swap" rel="stylesheet">
+
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        /* Custom CSS for enhanced aesthetics */
+        .gradient-bg {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(209, 213, 219, 0.3);
+        }
+
+        .dark .glass-effect {
+            background-color: rgba(17, 24, 39, 0.75);
+            border: 1px solid rgba(55, 65, 81, 0.3);
+        }
+        
+
+        
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* RTL support */
+        [dir="rtl"] .ltr\:hidden { display: none; }
+        [dir="ltr"] .rtl\:hidden { display: none; }
+
+        /* Number input styling */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dark .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="font-alexandria min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300"
+      x-data="paypalCalculator()"
+      x-init="init()"
+      :dir="currentLang === 'ar' ? 'rtl' : 'ltr'">
+
+<!-- Animated Background -->
+<div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse-slow"></div>
+    <div class="absolute -bottom-40 -start-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse-slow animation-delay-2000"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse-slow animation-delay-4000"></div>
+</div>
+
+<!-- Navigation Header -->
+<nav class="sticky top-0 z-50 glass-effect shadow-lg">
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <!-- Logo and Title -->
+            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h1 class="text-xl md:text-2xl font-bold gradient-text">
+                    <span x-text="translations[currentLang].title"></span>
+                </h1>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex items-center gap-2 md:gap-4">
+                <!-- Language Switcher -->
+                <button @click="toggleLanguage()"
+                        class="relative group px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            <span x-text="currentLang === 'en' ? 'العربية' : 'English'"></span>
+                        </span>
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button @click="toggleDarkMode()"
+                        class="relative group p-2.5 bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg">
+                    <svg x-show="!darkMode" class="w-5 h-5 text-amber-500 group-hover:rotate-180 transition-transform duration-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                    </svg>
+                    <svg x-show="darkMode" class="w-5 h-5 text-purple-400 group-hover:rotate-12 transition-transform duration-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main class="container mx-auto px-4 py-8 md:py-12">
+    <!-- Hero Section -->
+    <div class="text-center mb-12 animate-fade-in">
+        <h2 class="text-3xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4 animate-slide-up">
+            <span x-text="translations[currentLang].hero.title"></span>
+        </h2>
+        <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto animate-slide-up animation-delay-200">
+            <span x-text="translations[currentLang].hero.subtitle"></span>
+        </p>
+    </div>
+
+    <!-- Country Selection Card -->
+    <div class="glass-effect rounded-2xl shadow-xl p-6 md:p-8 mb-10 animate-slide-up animation-delay-400">
+        <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
+            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <span x-text="translations[currentLang].countrySelection.title"></span>
+        </h3>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <template x-for="country in countries" :key="country.code">
+                <button @click="selectCountry(country)"
+                        :class="{
+                                'ring-2 ring-blue-500 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30': selectedCountry.code === country.code,
+                                'bg-white dark:bg-gray-800': selectedCountry.code !== country.code
+                            }"
+                        class="relative group p-4 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover-lift overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-500 opacity-0 group-hover:opacity-5 transition-opacity"></div>
+                    <div class="relative z-10 flex flex-col items-center gap-3">
+                        <img :src="country.flag"
+                             :alt="country.name[currentLang]"
+                             class="w-12 h-12 rounded-full shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <div class="text-center">
+                            <p class="font-semibold text-gray-800 dark:text-gray-200" x-text="country.name[currentLang]"></p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <span x-text="country.feePercent"></span>% + $<span x-text="country.fixedFee"></span>
+                            </p>
+                        </div>
+                    </div>
+                </button>
+            </template>
+        </div>
+
+        <!-- Custom Fee Input Section -->
+        <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-6">
+            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                <span x-text="translations[currentLang].customFee.title"></span>
+            </h4>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                           x-text="translations[currentLang].customFee.percentage"></label>
+                    <div class="relative">
+                        <input type="number"
+                               x-model="customFeePercent"
+                               @input="updateCalculations()"
+                               step="0.01"
+                               min="0"
+                               max="100"
+                               class="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300  dark:text-white">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">%</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                           x-text="translations[currentLang].customFee.fixed"></label>
+                    <div class="relative">
+                        <input type="number"
+                               x-model="customFixedFee"
+                               @input="updateCalculations()"
+                               step="0.01"
+                               min="0"
+                               class="w-full px-4 py-3 pl-12 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 dark:text-white">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">$</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calculators Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <!-- Receive Calculator -->
+        <div class="glass-effect rounded-2xl shadow-xl p-6 md:p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white" x-text="translations[currentLang].receiveCalculator.title"></h3>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                           x-text="translations[currentLang].receiveCalculator.amountToReceive"></label>
+                    <div class="relative">
+                        <input type="number"
+                               x-model="amountToReceive"
+                               @input="calculateReceive()"
+                               step="0.01"
+                               min="0"
+                               placeholder="100.00"
+                               class="w-full px-4 py-4 pl-12 text-lg bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 dark:text-white">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-lg font-medium">$</span>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+                    <p class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2"
+                       x-text="translations[currentLang].receiveCalculator.senderPays"></p>
+                    <p class="text-3xl font-bold text-blue-900 dark:text-blue-100">
+                        $<span x-text="senderMustPay.toFixed(2)"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Send Calculator -->
+        <div class="glass-effect rounded-2xl shadow-xl p-6 md:p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-gradient-to-br from-red-400 to-rose-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white" x-text="translations[currentLang].sendCalculator.title"></h3>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                           x-text="translations[currentLang].sendCalculator.amountToSend"></label>
+                    <div class="relative">
+                        <input type="number"
+                               x-model="amountToSend"
+                               @input="calculateSend()"
+                               step="0.01"
+                               min="0"
+                               placeholder="100.00"
+                               class="w-full px-4 py-4 pl-12 text-lg bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-300 dark:text-white">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-lg font-medium">$</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+                        <p class="text-sm font-medium text-amber-700 dark:text-amber-300 mb-1"
+                           x-text="translations[currentLang].sendCalculator.fees"></p>
+                        <p class="text-2xl font-bold text-amber-900 dark:text-amber-100">
+                            $<span x-text="paypalFees.toFixed(2)"></span>
+                        </p>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-emerald-50 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                        <p class="text-sm font-medium text-emerald-700 dark:text-emerald-300 mb-1"
+                           x-text="translations[currentLang].sendCalculator.receiverGets"></p>
+                        <p class="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
+                            $<span x-text="receiverGets.toFixed(2)"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="glass-effect rounded-xl p-6 border border-amber-200 dark:border-amber-800 animate-slide-up animation-delay-1000">
+        <div class="flex items-start gap-3">
+            <svg class="w-6 h-6 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <p class="text-sm text-gray-700 dark:text-gray-300" x-text="translations[currentLang].disclaimer"></p>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="glass-effect border-t border-gray-200 dark:border-gray-800">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-start">
+                <p class="text-gray-600 dark:text-gray-400">
+                    <span x-text="translations[currentLang].footer.madeBy"></span>
+                    <span class="font-semibold text-gray-800 dark:text-gray-200">❤️</span>
+                    <span x-text="translations[currentLang].footer.by"></span>
+                    <a href="https://msaied.com"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                        Mohamed Said
+                    </a>
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                    <span x-text="translations[currentLang].footer.poweredBy"></span>
+                    <a href="https://msaied.com"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                        msaied.com
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <a href="https://github.com/EG-Mohamed/Paypal_Fee_Calculator"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="group flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    <span class="font-medium" x-text="translations[currentLang].footer.openSource"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function paypalCalculator() {
+        return {
+            // State
+            currentLang: 'ar',
+            darkMode: false,
+            selectedCountry: {},
+            customFeePercent: 4.9,
+            customFixedFee: 0.30,
+            amountToReceive: '',
+            amountToSend: '',
+            senderMustPay: 0,
+            paypalFees: 0,
+            receiverGets: 0,
+
+            // Countries data
+            countries: [
+                {
+                    code: 'EG',
+                    name: { en: 'Egypt', ar: 'مصر' },
+                    flag: 'https://flagcdn.com/w80/eg.png',
+                    feePercent: 4.9,
+                    fixedFee: 0.30
+                },
+                {
+                    code: 'SA',
+                    name: { en: 'Saudi Arabia', ar: 'السعودية' },
+                    flag: 'https://flagcdn.com/w80/sa.png',
+                    feePercent: 4.89,
+                    fixedFee: 0.30
+                },
+                {
+                    code: 'MA',
+                    name: { en: 'Morocco', ar: 'المغرب' },
+                    flag: 'https://flagcdn.com/w80/ma.png',
+                    feePercent: 4.4,
+                    fixedFee: 0.30
+                },
+                {
+                    code: 'AE',
+                    name: { en: 'UAE', ar: 'الإمارات' },
+                    flag: 'https://flagcdn.com/w80/ae.png',
+                    feePercent: 4.5,
+                    fixedFee: 0.30
+                },
+                {
+                    code: 'JO',
+                    name: { en: 'Jordan', ar: 'الأردن' },
+                    flag: 'https://flagcdn.com/w80/jo.png',
+                    feePercent: 4.4,
+                    fixedFee: 0.30
+                },
+                {
+                    code: 'LB',
+                    name: { en: 'Lebanon', ar: 'لبنان' },
+                    flag: 'https://flagcdn.com/w80/lb.png',
+                    feePercent: 4.9,
+                    fixedFee: 0.30
+                },
+                {
+                    code: 'QA',
+                    name: { en: 'Qatar', ar: 'قطر' },
+                    flag: 'https://flagcdn.com/w80/qa.png',
+                    feePercent: 4.5,
+                    fixedFee: 0.30
+                },
+                {
+                    code: 'KW',
+                    name: { en: 'Kuwait', ar: 'الكويت' },
+                    flag: 'https://flagcdn.com/w80/kw.png',
+                    feePercent: 4.5,
+                    fixedFee: 0.30
+                }
+            ],
+
+            // Translations
+            translations: {
+                en: {
+                    title: 'PayPal Fee Calculator',
+                    hero: {
+                        title: 'Calculate PayPal Fees Instantly',
+                        subtitle: 'Professional calculator for international PayPal transactions with multi-country support'
+                    },
+                    countrySelection: {
+                        title: 'Select Your Country'
+                    },
+                    customFee: {
+                        title: 'Custom Fee Configuration',
+                        percentage: 'Fee Percentage',
+                        fixed: 'Fixed Fee (USD)'
+                    },
+                    receiveCalculator: {
+                        title: 'Receive Money',
+                        amountToReceive: 'Amount You Want to Receive',
+                        senderPays: 'Sender Must Pay'
+                    },
+                    sendCalculator: {
+                        title: 'Send Money',
+                        amountToSend: 'Amount to Send',
+                        fees: 'PayPal Transaction Fees',
+                        receiverGets: 'Receiver Gets'
+                    },
+                    disclaimer: 'This calculator provides estimates based on standard PayPal fees. Actual fees may vary depending on account type, transaction volume, and current PayPal policies. Always verify with PayPal\'s official fee structure.',
+                    footer: {
+                        madeBy: 'Made with',
+                        by: 'by',
+                        poweredBy: 'Powered by',
+                        openSource: 'Open Source on GitHub'
+                    }
+                },
+                ar: {
+                    title: 'حاسبة عمولة باي بال',
+                    hero: {
+                        title: 'احسب عمولة باي بال فوراً',
+                        subtitle: 'حاسبة احترافية للمعاملات الدولية عبر باي بال مع دعم متعدد الدول'
+                    },
+                    countrySelection: {
+                        title: 'اختر دولتك'
+                    },
+                    customFee: {
+                        title: 'إعدادات العمولة المخصصة',
+                        percentage: 'نسبة العمولة',
+                        fixed: 'العمولة الثابتة (دولار)'
+                    },
+                    receiveCalculator: {
+                        title: 'استقبال الأموال',
+                        amountToReceive: 'المبلغ المطلوب استلامه',
+                        senderPays: 'المرسل يدفع'
+                    },
+                    sendCalculator: {
+                        title: 'إرسال الأموال',
+                        amountToSend: 'المبلغ المراد إرساله',
+                        fees: 'عمولة معاملة باي بال',
+                        receiverGets: 'المستلم يحصل على'
+                    },
+                    disclaimer: 'توفر هذه الحاسبة تقديرات بناءً على رسوم باي بال القياسية. قد تختلف الرسوم الفعلية حسب نوع الحساب وحجم المعاملات وسياسات باي بال الحالية. تحقق دائماً من هيكل الرسوم الرسمي لباي بال.',
+                    footer: {
+                        madeBy: 'صُنع بـ',
+                        by: 'بواسطة',
+                        poweredBy: 'مدعوم من',
+                        openSource: 'مفتوح المصدر على GitHub'
+                    }
+                }
+            },
+
+            // Initialize
+            init() {
+                // Check system preference for dark mode
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    this.darkMode = true;
+                }
+
+                // Load saved preferences
+                const savedLang = localStorage.getItem('paypal-calc-lang');
+                const savedTheme = localStorage.getItem('paypal-calc-theme');
+
+                if (savedLang) {
+                    this.currentLang = savedLang;
+                } else {
+                    // Auto-detect language
+                    const browserLang = navigator.language.toLowerCase();
+                    this.currentLang = browserLang.includes('ar') ? 'ar' : 'en';
+                }
+
+                if (savedTheme) {
+                    this.darkMode = savedTheme === 'dark';
+                }
+
+                // Apply theme
+                this.applyTheme();
+
+                // Set default country (Egypt)
+                this.selectedCountry = this.countries[0];
+                this.customFeePercent = this.selectedCountry.feePercent;
+                this.customFixedFee = this.selectedCountry.fixedFee;
+
+                // Apply language direction
+                document.documentElement.lang = this.currentLang;
+                document.documentElement.dir = this.currentLang === 'ar' ? 'rtl' : 'ltr';
+            },
+
+            // Toggle language
+            toggleLanguage() {
+                this.currentLang = this.currentLang === 'en' ? 'ar' : 'en';
+                localStorage.setItem('paypal-calc-lang', this.currentLang);
+                document.documentElement.lang = this.currentLang;
+                document.documentElement.dir = this.currentLang === 'ar' ? 'rtl' : 'ltr';
+            },
+
+            // Toggle dark mode
+            toggleDarkMode() {
+                this.darkMode = !this.darkMode;
+                this.applyTheme();
+                localStorage.setItem('paypal-calc-theme', this.darkMode ? 'dark' : 'light');
+            },
+
+            // Apply theme
+            applyTheme() {
+                if (this.darkMode) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            },
+
+            // Select country
+            selectCountry(country) {
+                this.selectedCountry = country;
+                this.customFeePercent = country.feePercent;
+                this.customFixedFee = country.fixedFee;
+                this.updateCalculations();
+            },
+
+            // Update all calculations
+            updateCalculations() {
+                this.calculateReceive();
+                this.calculateSend();
+            },
+
+            // Calculate receive amount
+            calculateReceive() {
+                const amount = parseFloat(this.amountToReceive) || 0;
+                const feePercent = parseFloat(this.customFeePercent) / 100;
+                const fixedFee = parseFloat(this.customFixedFee);
+
+                // Formula: Sender pays = (Amount + Fixed Fee) / (1 - Fee Percentage)
+                if (amount > 0) {
+                    this.senderMustPay = (amount + fixedFee) / (1 - feePercent);
+                } else {
+                    this.senderMustPay = 0;
+                }
+            },
+
+            // Calculate send amount
+            calculateSend() {
+                const amount = parseFloat(this.amountToSend) || 0;
+                const feePercent = parseFloat(this.customFeePercent) / 100;
+                const fixedFee = parseFloat(this.customFixedFee);
+
+                if (amount > 0) {
+                    // Calculate fees
+                    this.paypalFees = (amount * feePercent) + fixedFee;
+                    this.receiverGets = amount - this.paypalFees;
+
+                    // Ensure no negative values
+                    if (this.receiverGets < 0) {
+                        this.receiverGets = 0;
+                    }
+                } else {
+                    this.paypalFees = 0;
+                    this.receiverGets = 0;
+                }
+            }
+        }
+    }
+</script>
+</body>
+</html>
