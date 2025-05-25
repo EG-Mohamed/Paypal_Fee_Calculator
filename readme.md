@@ -6,7 +6,7 @@ A professional, multi-language PayPal fee calculator that supports various count
 
 ## 🌐 Live Demo
 
-👉 [paypal-fee-calculator.msaied.com](https://paypal-fee-calculator.msaied.com)
+👉 [paypal-fee-calculator.msaied.com](https://paypal-fees.msaied.com)
 
 ## ✨ Features
 
